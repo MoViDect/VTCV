@@ -1,7 +1,10 @@
 import pytesseract
 import cv2
 
-from src.translator import translate
+def translate(text):
+    kor_text = text
+    return kor_text
+
 
 
 def ocrtest(path=None):
@@ -21,7 +24,7 @@ def ocrtest(path=None):
     # pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/Cellar/tesseract/5.3.4_1/bin/tesseract' # for mac
 
     # 비디오 매 프레임 처리
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(2)
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
@@ -40,11 +43,19 @@ def ocrtest(path=None):
         # cv2.imshow('inversed', inversed)
         # cv2.imshow('edge', edge)
 
-        text = pytesseract.image_to_string(frame, lang='eng', config='--psm 4')
-        kor_text = translate(text)
-        img = cv2.putText(frame, kor_text, (350, 40), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 1)
+        texts = pytesseract.image_to_boxes(frame, lang='eng', config='--psm 6 --oem 1')
+        texts = texts.split('\n')
+        texts = list(filter(None, texts))
 
-        cv2.imshow('frame', img)
+        for word in texts:
+            data = word.split(' ')
+            if int(data[3]) - int(data[1]) < 150 and int(data[4]) - int(data[2]) < 150:
+                cv2.rectangle(frame, (int(data[1]), 1080 - int(data[2])), (int(data[3]), 1080 - int(data[4])), (255, 0, 0), -1)
+                cv2.putText(frame, data[0], (int(data[1]), 1080 - int(data[2])), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 1)
+        # kor_text = translate(text)
+        # img = cv2.putText(frame, kor_text, (350, 40), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 1)
+
+        cv2.imshow('frame', frame)
 
         # 10ms 기다리고 다음 프레임으로 전환, Esc누르면 while 강제 종료
         if cv2.waitKey(10) == 27:
