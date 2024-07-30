@@ -1,13 +1,12 @@
 import pytesseract
 import cv2
+from PIL import ImageFont, ImageDraw, Image
 from easyocr import Reader
 import time
 import datetime
+import numpy as np
 
-def translate(text):
-    kor_text = text
-    return kor_text
-
+from translator import translate
 
 
 def ocrtest(path=None):
@@ -24,10 +23,10 @@ def ocrtest(path=None):
     # use Tesseract to OCR the image
     # pytesseract.pytesseract.tesseract_cmd = f"C:/Program Files/Tesseract-OCR/tesseract.exe" # for Windows
     # pytesseract.pytesseract.tesseract_cmd = f'C:/Users/{USERNAME}/AppData/Local/tesseract.exe' # for Windows
-    pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/Cellar/tesseract/5.3.4_1/bin/tesseract' # for mac
+    # pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/Cellar/tesseract/5.3.4_1/bin/tesseract' # for mac
 
     # 비디오 매 프레임 처리
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(2)
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
@@ -35,6 +34,10 @@ def ocrtest(path=None):
     while True:  # 무한 루프
         start_time = time.time()
         ret, frame = cap.read()  # 두 개의 값을 반환하므로 두 변수 지정
+
+        background = np.zeros(shape=(1080, 1920, 3), dtype=np.uint8)
+
+        background[:, :, 1] = 255
 
         if not ret:  # 새로운 프레임을 못받아 왔을 때 braek
             break
@@ -49,14 +52,21 @@ def ocrtest(path=None):
 
         langs = ['en']
 
-        print("[INFO] OCR'ing input image...")
+        # print("[INFO] OCR'ing input image...")
         reader = Reader(lang_list=langs, gpu=True)
         results = reader.readtext(frame)
 
         for result in results:
             # print(f'{result[0][0]} {result[0][1]}')
-            cv2.rectangle(frame, (int(result[0][0][0]), int(result[0][0][1])), (int(result[0][2][0]), int(result[0][2][1])), (255, 0, 0), -1)
-            cv2.putText(frame, result[1], (int(result[0][0][0]), int(result[0][2][1])), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 1)
+            cv2.rectangle(background, (int(result[0][0][0]), int(result[0][0][1])), (int(result[0][2][0]), int(result[0][2][1])), (255, 0, 0), -1)
+            fontpath = "fonts/gulim.ttc"
+            font = ImageFont.truetype(fontpath, 20)
+            img_pil = Image.fromarray(background)
+            draw = ImageDraw.Draw(img_pil)
+            draw.text((int(result[0][0][0]), int(result[0][0][1])),  translate(result[1]), font=font, fill=(255, 255, 255, 0))
+
+            background = np.array(img_pil)
+            # cv2.putText(background, translate(result[1]), (int(result[0][0][0]), int(result[0][2][1])), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 1)
             # print(result)
 
 
@@ -72,7 +82,7 @@ def ocrtest(path=None):
         # kor_text = translate(text)
         # img = cv2.putText(frame, kor_text, (350, 40), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 1)
 
-        cv2.imshow('frame', frame)
+        cv2.imshow('frame', background)
 
         print(str(datetime.timedelta(seconds=time.time() - start_time)))
 
