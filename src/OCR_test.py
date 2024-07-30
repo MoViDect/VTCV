@@ -1,10 +1,7 @@
 import pytesseract
 import cv2
 
-def translate(text):
-    kor_text = text
-    return kor_text
-
+from src.translator import translate
 
 
 def ocrtest(path=None):
@@ -24,7 +21,7 @@ def ocrtest(path=None):
     # pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/Cellar/tesseract/5.3.4_1/bin/tesseract' # for mac
 
     # 비디오 매 프레임 처리
-    cap = cv2.VideoCapture(3)
+    cap = cv2.VideoCapture(0)
 
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
