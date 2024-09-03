@@ -1,8 +1,26 @@
-import numpy as np
+import argostranslate.package
+import argostranslate.translate
 
-def normal_pdf(x, mu=0, sigma=1):
-    deominator = np.sqrt(2*np.pi) * sigma
-    numerator = np.exp(-(x-mu)**2/(2*sigma**2))
-    return numerator / deominator
+from_code = "en"
+to_code = "ko"
 
-print(normal_pdf(0, 1.6, 0.489898))
+# Download and install Argos Translate package
+argostranslate.package.update_package_index()
+available_packages = argostranslate.package.get_available_packages()
+package_to_install = next(
+    filter(
+        lambda x: x.from_code == from_code and x.to_code == to_code, available_packages
+    )
+)
+argostranslate.package.install_from_path(package_to_install.download())
+
+# Translate
+translatedText = argostranslate.translate.translate("Hello World", from_code, to_code)
+print(translatedText)
+translatedText = argostranslate.translate.translate("Today is very cold", from_code, to_code)
+print(translatedText)
+translatedText = argostranslate.translate.translate("What's your favorite food?", from_code, to_code)
+print(translatedText)
+translatedText = argostranslate.translate.translate("Otherwise, We need to back quickly", from_code, to_code)
+print(translatedText)
+# '¡Hola Mundo!'

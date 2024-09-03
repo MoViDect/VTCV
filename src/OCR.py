@@ -34,11 +34,12 @@ def OCR(frame):
         cv2.rectangle(background, box_start, box_end, box_back_color, -1)
 
         # 표시할 언어를 번역하는 구간
-        # show_text = translate(result[1])
-        show_text = result[1]
+        show_text = translate(result[1])
+        # show_text = result[1]
 
         fontpath = "fonts/gulim.ttc" # 폰트 설정
-        font = ImageFont.truetype(fontpath, 20) # 폰트 객체 생성 및 글자 크기 지정
+        # font = ImageFont.truetype(fontpath, 20) # 폰트 객체 생성 및 글자 크기 지정
+        font = ImageFont.truetype(fontpath, int(result[0][2][1]) - int(result[0][0][1])) # 폰트 객체 생성 및 글자 크기 지정
         img_pil = Image.fromarray(background) # Pillow 이미지로 합성하기 위해 백그라운드 이미지를 Image 객체로 변환
         draw = ImageDraw.Draw(img_pil) # 이미지에 글자를 넣기위한 draw 객체 생성
         _, _, text_width, text_height = font.getbbox(show_text) # 글자의 길이 및 높이를 구하는 함수 (앞의 두 변수는 무시)
