@@ -3,7 +3,7 @@ from src.OCR import OCR
 
 if __name__ == '__main__':
     # 캡쳐장비 불러오기 현재 자신의 상황에 맞춘 번호로 사용
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(2)
 
     # 캡쳐장비 해상도 설정
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
