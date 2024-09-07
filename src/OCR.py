@@ -37,7 +37,7 @@ def OCR(frame):
         show_text = translate(result[1])
         # show_text = result[1]
 
-        fontpath = "fonts/gulim.ttc" # 폰트 설정
+        fontpath = "NanumGothic.ttf" # 폰트 설정
         # font = ImageFont.truetype(fontpath, 20) # 폰트 객체 생성 및 글자 크기 지정
         font = ImageFont.truetype(fontpath, int(result[0][2][1]) - int(result[0][0][1])) # 폰트 객체 생성 및 글자 크기 지정
         img_pil = Image.fromarray(background) # Pillow 이미지로 합성하기 위해 백그라운드 이미지를 Image 객체로 변환
