@@ -23,9 +23,14 @@ def OCR(frame):
 
     # OCR 진행
     results = reader.readtext(frame_gray, batch_size=8192) # 메모리가 부족할 경우 batch_size 조절
+    text_request = []
+    for result in results:
+        text_request.append(result[1])
+
+    translate_texts = translate('\n'.join(text_request)).split('\n')
 
     # OCR 진행 결과를 화면에 표시
-    for result in results:
+    for result, translate_text in zip(results, translate_texts):
         box_start = (int(result[0][0][0]), int(result[0][0][1])) # 기존의 텍스트가 시작하는 좌표
         box_end = (int(result[0][2][0]), int(result[0][2][1])) # 기존의 텍스트가 끝나는 좌표
         box_back_color = (int(frame[box_start[1], box_start[0], 0]), int(frame[box_start[1], box_start[0], 1]), int(frame[box_start[1], box_start[0], 2])) # 기존의 텍스트가 위치한 배경 색상 추출
@@ -34,7 +39,7 @@ def OCR(frame):
         cv2.rectangle(background, box_start, box_end, box_back_color, -1)
 
         # 표시할 언어를 번역하는 구간
-        show_text = translate(result[1])
+        show_text = translate_text
         # show_text = result[1]
 
         fontpath = "NanumGothic.ttf" # 폰트 설정
