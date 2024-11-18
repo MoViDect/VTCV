@@ -2,6 +2,7 @@ import cv2
 from PIL import ImageFont, ImageDraw, Image
 from easyocr import Reader
 import numpy as np
+import os
 
 # 번역 부분 Import
 from src.translator import translate
@@ -11,7 +12,9 @@ langs = ['en']
 reader = Reader(lang_list=langs, gpu=True) # GPU가 없을 경우 gpu=False로 지정
 
 # OCR 진행 함수
-def OCR(frame):
+def OCR(frame, option_font, option_engine):
+    print(option_font)
+
     # 흑백 이미지로 변환 (OCR 처리 속도 향상을 위해서)
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -42,7 +45,8 @@ def OCR(frame):
         show_text = translate_text
         # show_text = result[1]
 
-        fontpath = "NanumGothic.ttf" # 폰트 설정
+        current_dir = os.path.dirname(__file__)
+        fontpath = os.path.join(current_dir, option_font)
         # font = ImageFont.truetype(fontpath, 20) # 폰트 객체 생성 및 글자 크기 지정
         font = ImageFont.truetype(fontpath, int(result[0][2][1]) - int(result[0][0][1])) # 폰트 객체 생성 및 글자 크기 지정
         img_pil = Image.fromarray(background) # Pillow 이미지로 합성하기 위해 백그라운드 이미지를 Image 객체로 변환
